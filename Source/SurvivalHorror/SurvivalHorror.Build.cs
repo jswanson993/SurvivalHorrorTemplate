@@ -10,7 +10,7 @@ public class SurvivalHorror : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  "UnrealEd", "Health" });
+		PrivateDependencyModuleNames.AddRange(new string[] {  "UnrealEd", "Health", "Interaction" });
 		PrivateIncludePathModuleNames.AddRange(new string[] { "Health", "Interaction" });
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

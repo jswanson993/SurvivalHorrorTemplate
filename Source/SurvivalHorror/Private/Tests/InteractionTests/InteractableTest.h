@@ -30,10 +30,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Selected_Implementation() override {bIsSelected = true;};
-	void Unselected_Implementation() override {bIsUnselected = true;};
-	void Use_Implementation() override {};
-	void AlternativeUse_Implementation() override {};
+	virtual void Selected_Implementation() override {bIsSelected = true;};
+	virtual void Unselected_Implementation() override {bIsUnselected = true;};
+	virtual void Use_Implementation() override {};
+	virtual void AlternativeUse_Implementation() override {};
 
 	const bool GetSelected() { return bIsSelected; };
 	const bool GetUnselected() { return bIsUnselected; }
