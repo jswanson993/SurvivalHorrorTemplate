@@ -24,6 +24,7 @@ class INTERACTION_API IInteractable
 public:
 
 	virtual void Selected();
+	virtual void Unselected();
 	virtual void Use();
 	virtual void AlternateUse();
 };
