@@ -4,6 +4,7 @@
 #include "InteractionComponent.h"
 
 #include "Interactable.h"
+#include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -13,8 +14,8 @@ UInteractionComponent::UInteractionComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	ActorsToIgnore.Add(this->GetOwner());
-	// ...
+	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("InteractArrow");
+	ArrowComponent->SetupAttachment(this);
 }
 
 
@@ -23,8 +24,7 @@ void UInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	ActorsToIgnore.Add(this->GetOwner());
 }
 
 void UInteractionComponent::UpdateHitActors()
@@ -37,7 +37,6 @@ void UInteractionComponent::UpdateHitActors()
 		{
 			AActor* HitActor = Hit.GetActor();
 			
-			if(!HitActor->Implements<IInteractable>()){continue;}
 			auto Interactable = Cast<IInteractable>(HitActor);
 			if(Interactable == nullptr){ continue;}
 			Interactable->Selected();

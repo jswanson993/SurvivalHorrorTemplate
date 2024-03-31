@@ -7,6 +7,18 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "InteractionComponent.generated.h"
 
+class UArrowComponent;
+class UGizmoArrowComponent;
+
+UENUM()
+enum ETraceShape
+{
+	Line,
+	Box,
+	Capsule,
+	Sphere
+};
+
 UENUM()
 enum ETraceStyle
 {
@@ -24,7 +36,7 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	TEnumAsByte<ETraceStyle> TraceStyle;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	TEnumAsByte<ECollisionShape::Type> TraceShape;
+	TEnumAsByte<ETraceShape> TraceShape; 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	float TraceDistance = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
@@ -52,6 +64,9 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	float SphereRadius;
 	FHitResult HitResult;
 	TArray<FHitResult> HitResults;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Editor",meta=(AllowPrivateAccess="true"))
+	UArrowComponent* ArrowComponent;
 	
 	UPROPERTY()
 	TArray<AActor*> HitActors;
