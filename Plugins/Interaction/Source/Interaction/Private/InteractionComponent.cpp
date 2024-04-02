@@ -75,7 +75,10 @@ TArray<FHitResult> UInteractionComponent::GetHitResults()
 	{
 	case Single:
 		HitResults.Empty();
-		HitResults.Add(HitResult);
+		if(HitResult.bBlockingHit)
+		{
+			HitResults.Add(HitResult);
+		}
 		break;
 	default:
 		break;

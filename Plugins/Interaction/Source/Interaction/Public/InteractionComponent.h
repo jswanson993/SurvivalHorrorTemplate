@@ -33,6 +33,7 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	TEnumAsByte<ETraceStyle> TraceStyle;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
@@ -53,7 +54,7 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType = EDrawDebugTrace::Type::ForOneFrame;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	float DrawTime = 0;
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Trace|Shape|Box", meta=(AllowPrivateAccess="true"))
 	FVector BoxHalfSize;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Trace|Shape|Capsule", meta=(AllowPrivateAccess="true"))
@@ -88,6 +89,35 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintSetter)
+	void SetTraceStyle(ETraceStyle NewTraceStyle) { TraceStyle = NewTraceStyle; }
+	UFUNCTION(BlueprintSetter)
+	void SetTraceShape(ETraceShape NewTraceShape) { TraceShape = NewTraceShape; }
+	UFUNCTION(BlueprintSetter)
+	void SetTraceDistance(float NewDistance) { TraceDistance = NewDistance; }
+	UFUNCTION(BlueprintSetter)
+	void SetTraceQuery(ETraceTypeQuery NewTraceTypeQuery) { TraceTypeQuery = NewTraceTypeQuery; }
+	UFUNCTION(BlueprintSetter)
+	void SetDrawDebugLine(bool NewDrawDebugLine) { this->bDrawDebugLine = NewDrawDebugLine; }
+	UFUNCTION(BlueprintSetter)
+	void SetTraceColor(const FColor& NewTraceColor) { this->TraceColor = NewTraceColor; }
+	UFUNCTION(BlueprintSetter)
+	void SetTraceHitColor(const FColor& NewTraceHitColor) { this->TraceHitColor = NewTraceHitColor; }
+	UFUNCTION(BlueprintSetter)
+	void SetActorsToIgnore(const TArray<AActor*>& NewActorsToIgnore) { this->ActorsToIgnore = NewActorsToIgnore; }
+	UFUNCTION(BlueprintSetter)
+	void SetDrawDebugType(const TEnumAsByte<EDrawDebugTrace::Type>& NewDrawDebugType) { this->DrawDebugType = NewDrawDebugType; }
+	UFUNCTION(BlueprintSetter)
+	void SetDrawTime(float NewDrawTime) { this->DrawTime = NewDrawTime; }
+	UFUNCTION(BlueprintSetter)
+	void SetBoxHalfSize(const FVector& NewBoxHalfSize) { this->BoxHalfSize = NewBoxHalfSize; }
+	UFUNCTION(BlueprintSetter)
+	void SetCapsuleRadius(float NewCapsuleRadius) { this->CapsuleRadius = NewCapsuleRadius; }
+	UFUNCTION(BlueprintSetter)
+	void SetCapsuleHalfHeight(float NewCapsuleHalfHeight) { this->CapsuleHalfHeight = NewCapsuleHalfHeight; }
+	UFUNCTION(BlueprintSetter)
+	void SetSphereRadius(float NewSphereRadius) { this->SphereRadius = NewSphereRadius; }
 
 	TArray<FHitResult> GetHitResults();
 

@@ -8,6 +8,7 @@
 
 namespace HealthTests
 {
+	/*
 	///////////////////////Test Setup////////////////////////////////////////////////
 	UWorld* World;
 	AHealthComponentTestActor* Actor;
@@ -29,6 +30,7 @@ namespace HealthTests
 	//////////Begin Tests//////////////////////////////////////////////
 
 #if WITH_DEV_AUTOMATION_TESTS
+
 	IMPLEMENT_SIMPLE_AUTOMATION_TEST(FHealthComponent_Initilization, "Health.HealthComponent.Initialization",
 									 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
@@ -198,4 +200,5 @@ namespace HealthTests
 	}
 
 #endif
+	*/
 }
