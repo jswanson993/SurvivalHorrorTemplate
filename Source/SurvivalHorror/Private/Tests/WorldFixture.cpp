@@ -18,6 +18,8 @@ FWorldFixture::FWorldFixture(const FURL& URL)
 				//Need to do this manually since world doesn't have a game mode
 				World->GetWorldSettings()->NotifyBeginPlay();
 				World->GetWorldSettings()->NotifyMatchStarted();
+				World->GetWorldSettings()->PreInitializeComponents();
+				World->GetWorldSettings()->InitializeComponents();
 			}
 			World->BeginPlay();
 

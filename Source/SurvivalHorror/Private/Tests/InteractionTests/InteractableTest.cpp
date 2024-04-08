@@ -13,6 +13,7 @@ AInteractableTest::AInteractableTest()
 	PrimaryActorTick.bCanEverTick = true;
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	BoxCollision->SetCollisionObjectType(ECC_WorldDynamic);
+	BoxCollision->InitBoxExtent(FVector(10,10,10));
 	RootComponent = BoxCollision;
 }
 

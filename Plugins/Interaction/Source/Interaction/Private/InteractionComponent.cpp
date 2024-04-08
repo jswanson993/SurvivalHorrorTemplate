@@ -14,6 +14,7 @@ UInteractionComponent::UInteractionComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostPhysics;
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("InteractArrow");
 	ArrowComponent->SetupAttachment(this);
 }
@@ -31,17 +32,22 @@ void UInteractionComponent::UpdateHitActors()
 {
 	TArray<AActor*> LastHitActors = HitActors;
 	TArray<AActor*> CurrentHitActors;
-	for (FHitResult Hit : GetHitResults())
+	TArray<FHitResult> NewHitResults = GetHitResults();
+	bIsUpdatingActors = true;
+	//NewHitResults = TArray<FHitResult>::CopyToEmpty(GetHitResults(), GetHitResults().Num(), );
+	for (FHitResult Hit : NewHitResults)
 	{
 		if(Hit.bBlockingHit)
 		{
 			AActor* HitActor = Hit.GetActor();
 			
-			auto Interactable = Cast<IInteractable>(HitActor);
-			if(Interactable == nullptr){ continue;}
-			Interactable->Selected();
 			
-			CurrentHitActors.Add(HitActor);
+			if(HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+			{
+				IInteractable::Execute_Selected(HitActor);
+				CurrentHitActors.Add(HitActor);
+			}
+
 			if(LastHitActors.Contains(HitActor))
 			{
 				LastHitActors.Remove(HitActor);
@@ -51,12 +57,14 @@ void UInteractionComponent::UpdateHitActors()
 
 	for(AActor* Actor : LastHitActors)
 	{
-		auto Interactable = Cast<IInteractable>(Actor);
-		if(Interactable == nullptr){continue;}
-		Interactable->Unselected();
+		if(Actor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		{
+			IInteractable::Execute_Selected(Actor);
+		}
 	}
 
 	HitActors = CurrentHitActors;
+	bIsUpdatingActors = false;
 }
 
 
@@ -64,9 +72,13 @@ void UInteractionComponent::UpdateHitActors()
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                           FActorComponentTickFunction* ThisTickFunction)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Looking for actors"))
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	PerformTrace();
-	UpdateHitActors();
+	if(!bIsUpdatingActors)
+	{
+		PerformTrace();
+		UpdateHitActors();
+	}
 }
 
 TArray<FHitResult> UInteractionComponent::GetHitResults()
@@ -112,19 +124,19 @@ void UInteractionComponent::TraceSingle()
 	{
 	case ECollisionShape::Line:
 
-		UKismetSystemLibrary::LineTraceSingle(World,GetComponentLocation(), EndPoint, TraceTypeQuery,
+		UKismetSystemLibrary::LineTraceSingleForObjects(World,GetComponentLocation(), EndPoint, ObjectTypeQuery,
 			false, ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	case ECollisionShape::Box:
-		UKismetSystemLibrary::BoxTraceSingle(World, StartPoint, EndPoint, BoxHalfSize, Orientation, TraceTypeQuery,
+		UKismetSystemLibrary::BoxTraceSingleForObjects(World, StartPoint, EndPoint, BoxHalfSize, Orientation, ObjectTypeQuery,
 			false, ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	case ECollisionShape::Capsule:
-		UKismetSystemLibrary::CapsuleTraceSingle(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, TraceTypeQuery,
+		UKismetSystemLibrary::CapsuleTraceSingleForObjects(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, ObjectTypeQuery,
 			false,ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	case ECollisionShape::Sphere:
-		UKismetSystemLibrary::SphereTraceSingle(World, StartPoint, EndPoint, SphereRadius, TraceTypeQuery, false, ActorsToIgnore,
+		UKismetSystemLibrary::SphereTraceSingleForObjects(World, StartPoint, EndPoint, SphereRadius, ObjectTypeQuery, false, ActorsToIgnore,
 			DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	default:
@@ -143,19 +155,19 @@ void UInteractionComponent::TraceMulti()
 	{
 	case ECollisionShape::Line:
 
-		UKismetSystemLibrary::LineTraceMulti(World,GetComponentLocation(), EndPoint, TraceTypeQuery,
+		UKismetSystemLibrary::LineTraceMultiForObjects(World,GetComponentLocation(), EndPoint, ObjectTypeQuery,
 			false, ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	case ECollisionShape::Box:
-		UKismetSystemLibrary::BoxTraceMulti(World, StartPoint, EndPoint, BoxHalfSize, Orientation, TraceTypeQuery,
+		UKismetSystemLibrary::BoxTraceMultiForObjects(World, StartPoint, EndPoint, BoxHalfSize, Orientation, ObjectTypeQuery,
 			false, ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	case ECollisionShape::Capsule:
-		UKismetSystemLibrary::CapsuleTraceMulti(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, TraceTypeQuery,
+		UKismetSystemLibrary::CapsuleTraceMultiForObjects(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, ObjectTypeQuery,
 			false,ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	case ECollisionShape::Sphere:
-		UKismetSystemLibrary::SphereTraceMulti(World, StartPoint, EndPoint, SphereRadius, TraceTypeQuery, false, ActorsToIgnore,
+		UKismetSystemLibrary::SphereTraceMultiForObjects(World, StartPoint, EndPoint, SphereRadius, ObjectTypeQuery, false, ActorsToIgnore,
 			DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
 	default:

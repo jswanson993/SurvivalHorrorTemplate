@@ -41,7 +41,7 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	float TraceDistance = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	TEnumAsByte<ETraceTypeQuery> TraceTypeQuery;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuery;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	bool bDrawDebugLine = true;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
@@ -71,6 +71,8 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	
 	UPROPERTY()
 	TArray<AActor*> HitActors;
+
+	bool bIsUpdatingActors = false;
 public:
 	// Sets default values for this component's properties
 	UInteractionComponent();
@@ -97,7 +99,7 @@ public:
 	UFUNCTION(BlueprintSetter)
 	void SetTraceDistance(float NewDistance) { TraceDistance = NewDistance; }
 	UFUNCTION(BlueprintSetter)
-	void SetTraceQuery(ETraceTypeQuery NewTraceTypeQuery) { TraceTypeQuery = NewTraceTypeQuery; }
+	void SetObjectQuery(const TArray<TEnumAsByte<EObjectTypeQuery>> &NewObjectTypeQuery) { ObjectTypeQuery = NewObjectTypeQuery; }
 	UFUNCTION(BlueprintSetter)
 	void SetDrawDebugLine(bool NewDrawDebugLine) { this->bDrawDebugLine = NewDrawDebugLine; }
 	UFUNCTION(BlueprintSetter)
