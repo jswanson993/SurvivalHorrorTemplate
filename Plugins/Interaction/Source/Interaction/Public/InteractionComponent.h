@@ -26,7 +26,7 @@ enum ETraceStyle
 	Multi
 };
 
-//Create Delegate To Broadcast hit actors and components
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class INTERACTION_API UInteractionComponent : public USceneComponent
@@ -34,14 +34,16 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	GENERATED_BODY()
 
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	TEnumAsByte<ETraceStyle> TraceStyle;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Trace|Shape", meta=(AllowPrivateAccess="true"))
 	TEnumAsByte<ETraceShape> TraceShape; 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	float TraceDistance = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuery;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
+	TEnumAsByte<ETraceTypeQuery> TraceTypeQuery;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	bool bDrawDebugLine = true;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
@@ -50,19 +52,19 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	FColor TraceHitColor = FColor::Green;
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category=Trace, meta=(AllowPrivateAccess="true"))
 	TArray<AActor*> ActorsToIgnore;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType = EDrawDebugTrace::Type::ForOneFrame;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	float DrawTime = 0;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Trace|Shape|Box", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Trace|Shape|Box", meta=(AllowPrivateAccess="true"))
 	FVector BoxHalfSize;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Trace|Shape|Capsule", meta=(AllowPrivateAccess="true"))
-	float CapsuleRadius;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Trace|Shape|Capsule", meta=(AllowPrivateAccess="true"))
-	float CapsuleHalfHeight;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Trace|Shape|Sphere", meta=(AllowPrivateAccess="true"))
-	float SphereRadius;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Trace|Shape|Capsule", meta=(AllowPrivateAccess="true"))
+	float CapsuleRadius = 30;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Trace|Shape|Capsule", meta=(AllowPrivateAccess="true"))
+	float CapsuleHalfHeight = 60;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Trace|Shape|Sphere", meta=(AllowPrivateAccess="true"))
+	float SphereRadius = 100;
 	FHitResult HitResult;
 	TArray<FHitResult> HitResults;
 

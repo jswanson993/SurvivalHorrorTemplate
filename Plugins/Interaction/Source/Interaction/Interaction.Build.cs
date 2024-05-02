@@ -25,7 +25,7 @@ public class Interaction : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "Engine",
+				"Core", "Engine"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -38,6 +38,8 @@ public class Interaction : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"EditorTests",
+				"UnrealEd"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

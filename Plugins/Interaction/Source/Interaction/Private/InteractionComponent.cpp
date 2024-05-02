@@ -72,7 +72,6 @@ void UInteractionComponent::UpdateHitActors()
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                           FActorComponentTickFunction* ThisTickFunction)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Looking for actors"))
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if(!bIsUpdatingActors)
 	{
@@ -122,20 +121,19 @@ void UInteractionComponent::TraceSingle()
 	FRotator Orientation = GetComponentRotation();
 	switch (TraceShape)
 	{
-	case ECollisionShape::Line:
-
+	case ETraceShape::Line:
 		UKismetSystemLibrary::LineTraceSingleForObjects(World,GetComponentLocation(), EndPoint, ObjectTypeQuery,
-			false, ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
+		false, ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
-	case ECollisionShape::Box:
+	case ETraceShape::Box:
 		UKismetSystemLibrary::BoxTraceSingleForObjects(World, StartPoint, EndPoint, BoxHalfSize, Orientation, ObjectTypeQuery,
 			false, ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
-	case ECollisionShape::Capsule:
+	case ETraceShape::Capsule:
 		UKismetSystemLibrary::CapsuleTraceSingleForObjects(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, ObjectTypeQuery,
 			false,ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
-	case ECollisionShape::Sphere:
+	case ETraceShape::Sphere:
 		UKismetSystemLibrary::SphereTraceSingleForObjects(World, StartPoint, EndPoint, SphereRadius, ObjectTypeQuery, false, ActorsToIgnore,
 			DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
 		break;
@@ -153,20 +151,20 @@ void UInteractionComponent::TraceMulti()
 	const FRotator Orientation = GetComponentRotation();
 	switch (TraceShape)
 	{
-	case ECollisionShape::Line:
+	case ETraceShape::Line:
 
 		UKismetSystemLibrary::LineTraceMultiForObjects(World,GetComponentLocation(), EndPoint, ObjectTypeQuery,
 			false, ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
-	case ECollisionShape::Box:
+	case ETraceShape::Box:
 		UKismetSystemLibrary::BoxTraceMultiForObjects(World, StartPoint, EndPoint, BoxHalfSize, Orientation, ObjectTypeQuery,
 			false, ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
-	case ECollisionShape::Capsule:
+	case ETraceShape::Capsule:
 		UKismetSystemLibrary::CapsuleTraceMultiForObjects(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, ObjectTypeQuery,
 			false,ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
-	case ECollisionShape::Sphere:
+	case ETraceShape::Sphere:
 		UKismetSystemLibrary::SphereTraceMultiForObjects(World, StartPoint, EndPoint, SphereRadius, ObjectTypeQuery, false, ActorsToIgnore,
 			DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
 		break;
