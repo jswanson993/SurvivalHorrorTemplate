@@ -1,11 +1,11 @@
-﻿#if WITH_AUTOMATION_TESTS
+﻿
 #include "HealthComponent.h"
-#include "HealthComponentTestActor.h"
+#include "Fixtures/HealthComponentTestActor.h"
 #include "Engine/DamageEvents.h"
-#include "Tests/WorldFixture.h"
+#include "Fixtures/WorldFixture.h"
 #include "Misc/AutomationTest.h"
 
-
+#if WITH_AUTOMATION_TESTS
 
 BEGIN_DEFINE_SPEC(FHealthComponent, "Health.HealthComponent",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter);

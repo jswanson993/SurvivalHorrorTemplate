@@ -1,4 +1,6 @@
 ﻿#pragma once
+
+#include "Engine/Engine.h"
 #include "EngineUtils.h"
 
 class FWorldFixture

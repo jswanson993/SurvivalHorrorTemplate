@@ -1,12 +1,12 @@
-﻿#include "../../../../../../Source/SurvivalHorror/Private/Tests/WorldFixture.h"
-#include "Fixtures/BlockingTestActor.h"
-#if WITH_AUTOMATION_TESTS
+﻿#if WITH_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
-#include "InteractableTest.h"
+#include "Fixtures/InteractableTest.h"
 #include "InteractionComponent.h"
 #include "Fixtures/InteractionTestActor.h"
 #include "Tests/AutomationEditorCommon.h"
 #include "Tests/AutomationCommon.h"
+#include "Fixtures/WorldFixture.h"
+#include "Fixtures/BlockingTestActor.h"
 
 
 BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
@@ -21,18 +21,18 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 	UInteractionComponent* InteractionComponent;
 	bool bMapLoaded = false;
 
-	int NumActualHitResults = 0;
-	int NumExpectedHitResults = 0;
-	TArray<FHitResult> ActualHitResults;
+	int NumActualHitInteractables = 0;
+	int NumExpectedHitInteractables = 0;
+	TArray<AActor*> ActualHitInteractables;
 	FTimespan Timeout = FTimespan(10);
 
 	void GetHitResults()
 	{
-		NumActualHitResults = 0;
-		while (NumActualHitResults == 0)
+		NumActualHitInteractables = 0;
+		while (NumActualHitInteractables == 0)
 		{
-			ActualHitResults = InteractionComponent->GetHitResults();
-			NumActualHitResults = ActualHitResults.Num();
+			ActualHitInteractables = InteractionComponent->GetInteractables();
+			NumActualHitInteractables = ActualHitInteractables.Num();
 		}
 	}
 
@@ -43,7 +43,7 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 			BeforeEach([this]()
 			{
 				Interactable->SetActorLocation(FVector(10000, 10000, 10000));
-				NumExpectedHitResults = 0;
+				NumExpectedHitInteractables = 0;
 			});
 			LatentIt("Should not have any hits", EAsyncExecution::ThreadPool, [this](const FDoneDelegate& Done)
 			{
@@ -57,11 +57,11 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 
 					AsyncTask(ENamedThreads::GameThread, [this, Done]()
 					{
-						NumActualHitResults = InteractionComponent->GetHitResults().Num();
+						NumActualHitInteractables = InteractionComponent->GetInteractables().Num();
 						TestEqual(FString::Printf(
-							          TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"),
-							          NumActualHitResults, NumExpectedHitResults), NumActualHitResults,
-						          NumExpectedHitResults);
+							          TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"),
+							          NumActualHitInteractables, NumExpectedHitInteractables), NumActualHitInteractables,
+						          NumExpectedHitInteractables);
 						Done.Execute();
 					});
 				});
@@ -69,7 +69,7 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 		});
 		BeforeEach([this]()
 		{
-			NumExpectedHitResults = 1;
+			NumExpectedHitInteractables = 1;
 		});
 		Describe("Interactable Inside Trace", [this]()
 		{
@@ -88,23 +88,23 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 						Done.Execute();
 					});
 				});
-				It("Should Find One Hit Result", [this]()
+				It("Should Find One Hit Interactable", [this]()
 				{
-					TestEqual(FString::Printf(TEXT("NumExpectedHitResults: %d == NumActualHitResults: %d"),
-					                          NumExpectedHitResults, NumActualHitResults),
-					          NumExpectedHitResults, NumActualHitResults);
+					TestEqual(FString::Printf(TEXT("NumExpectedHitInteractables: %d == NumActualHitInteractables: %d"),
+					                          NumExpectedHitInteractables, NumActualHitInteractables),
+					          NumExpectedHitInteractables, NumActualHitInteractables);
 				});
 				It("Should Find Interactable", [this]()
 				{
-					if (ActualHitResults.Num() == 0)
+					if (ActualHitInteractables.Num() == 0)
 					{
-						AddError("Test Returned 0 Hit Results");
+						AddError("Test Returned 0 Hit Interactables");
 					}
-					if (ActualHitResults.Num() > NumExpectedHitResults)
+					if (ActualHitInteractables.Num() > NumExpectedHitInteractables)
 					{
-						AddError("Test Returned More Hit Results Than Expected");
+						AddError("Test Returned More Hit Interactables Than Expected");
 					}
-					AActor* ActualActor = ActualHitResults[0].GetActor();
+					AActor* ActualActor = ActualHitInteractables[0];
 					AActor* ExpectedActor = Cast<AActor>(Interactable);
 					TestEqual(FString::Printf(TEXT("ExpectedActor: %s == ActualActor: %s"),
 					                          *ActualActor->GetName(), *ExpectedActor->GetName()),
@@ -126,23 +126,23 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 						Done.Execute();
 					});
 				});
-				It("Should Find One Hit Result", [this]()
+				It("Should Find One Hit Interactable", [this]()
 				{
-					TestEqual(FString::Printf(TEXT("NumExpectedHitResults: %d == NumActualHitResults: %d"),
-					                          NumExpectedHitResults, NumActualHitResults),
-					          NumExpectedHitResults, NumActualHitResults);
+					TestEqual(FString::Printf(TEXT("NumExpectedHitInteractables: %d == NumActualHitInteractables: %d"),
+					                          NumExpectedHitInteractables, NumActualHitInteractables),
+					          NumExpectedHitInteractables, NumActualHitInteractables);
 				});
 				It("Should Find Interactable", [this]()
 				{
-					if (ActualHitResults.Num() == 0)
+					if (ActualHitInteractables.Num() == 0)
 					{
-						AddError("Test Returned 0 Hit Results");
+						AddError("Test Returned 0 Hit Interactables");
 					}
-					if (ActualHitResults.Num() > NumExpectedHitResults)
+					if (ActualHitInteractables.Num() > NumExpectedHitInteractables)
 					{
-						AddError("Test Returned More Hit Results Than Expected");
+						AddError("Test Returned More Hit Interactables Than Expected");
 					}
-					AActor* ActualActor = ActualHitResults[0].GetActor();
+					AActor* ActualActor = ActualHitInteractables[0];
 					AActor* ExpectedActor = Cast<AActor>(Interactable);
 					TestEqual(FString::Printf(TEXT("ExpectedActor: %s == ActualActor: %s"),
 					                          *ActualActor->GetName(), *ExpectedActor->GetName()),
@@ -164,23 +164,23 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 						Done.Execute();
 					});
 				});
-				It("Should Find One Hit Result", [this]()
+				It("Should Find One Hit Interactable", [this]()
 				{
-					TestEqual(FString::Printf(TEXT("NumExpectedHitResults: %d == NumActualHitResults: %d"),
-					                          NumExpectedHitResults, NumActualHitResults),
-					          NumExpectedHitResults, NumActualHitResults);
+					TestEqual(FString::Printf(TEXT("NumExpectedHitInteractables: %d == NumActualHitInteractables: %d"),
+					                          NumExpectedHitInteractables, NumActualHitInteractables),
+					          NumExpectedHitInteractables, NumActualHitInteractables);
 				});
 				It("Should Find Interactable", [this]()
 				{
-					if (ActualHitResults.Num() == 0)
+					if (ActualHitInteractables.Num() == 0)
 					{
-						AddError("Test Returned 0 Hit Results");
+						AddError("Test Returned 0 Hit Interactables");
 					}
-					if (ActualHitResults.Num() > NumExpectedHitResults)
+					if (ActualHitInteractables.Num() > NumExpectedHitInteractables)
 					{
-						AddError("Test Returned More Hit Results Than Expected");
+						AddError("Test Returned More Hit Interactables Than Expected");
 					}
-					AActor* ActualActor = ActualHitResults[0].GetActor();
+					AActor* ActualActor = ActualHitInteractables[0];
 					AActor* ExpectedActor = Cast<AActor>(Interactable);
 					TestEqual(FString::Printf(TEXT("ExpectedActor: %s == ActualActor: %s"),
 					                          *ActualActor->GetName(), *ExpectedActor->GetName()),
@@ -203,23 +203,23 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 						Done.Execute();
 					});
 				});
-				It("Should Find One Hit Result", [this]()
+				It("Should Find One Hit Interactable", [this]()
 				{
-					TestEqual(FString::Printf(TEXT("NumExpectedHitResults: %d == NumActualHitResults: %d"),
-					                          NumExpectedHitResults, NumActualHitResults),
-					          NumExpectedHitResults, NumActualHitResults);
+					TestEqual(FString::Printf(TEXT("NumExpectedHitInteractables: %d == NumActualHitInteractables: %d"),
+					                          NumExpectedHitInteractables, NumActualHitInteractables),
+					          NumExpectedHitInteractables, NumActualHitInteractables);
 				});
 				It("Should Find Interactable", [this]()
 				{
-					if (ActualHitResults.Num() == 0)
+					if (ActualHitInteractables.Num() == 0)
 					{
-						AddError("Test Returned 0 Hit Results");
+						AddError("Test Returned 0 Hit Interactables");
 					}
-					if (ActualHitResults.Num() > NumExpectedHitResults)
+					if (ActualHitInteractables.Num() > NumExpectedHitInteractables)
 					{
-						AddError("Test Returned More Hit Results Than Expected");
+						AddError("Test Returned More Hit Interactables Than Expected");
 					}
-					AActor* ActualActor = ActualHitResults[0].GetActor();
+					AActor* ActualActor = ActualHitInteractables[0];
 					AActor* ExpectedActor = Cast<AActor>(Interactable);
 					TestEqual(FString::Printf(TEXT("ExpectedActor: %s == ActualActor: %s"),
 					                          *ActualActor->GetName(), *ExpectedActor->GetName()),
@@ -244,11 +244,11 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 					Done.Execute();
 				});
 			});
-			It("Should Find One Hit Result", [this]()
+			It("Should Find One Hit Interactable", [this]()
 			{
-				TestEqual(FString::Printf(TEXT("NumExpectedHitResults: %d == NumActualHitResults: %d"),
-				                          NumExpectedHitResults, NumActualHitResults), NumExpectedHitResults,
-				          NumActualHitResults);
+				TestEqual(FString::Printf(TEXT("NumExpectedHitInteractables: %d == NumActualHitInteractables: %d"),
+				                          NumExpectedHitInteractables, NumActualHitInteractables), NumExpectedHitInteractables,
+				          NumActualHitInteractables);
 			});
 			LatentAfterEach(EAsyncExecution::TaskGraph, [this](const FDoneDelegate& Done)
 			{
@@ -271,35 +271,44 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 		{
 			BeforeEach([this]()
 			{
-				Interactable->SetActorLocation(FVector(0, 1000, 0));
-				Interactable2->SetActorLocation(FVector(0, -1000, 0));
-				NumExpectedHitResults = 0;
+				Interactable->SetActorLocation(FVector(0, 100000, 0));
+				Interactable2->SetActorLocation(FVector(0, -100000, 0));
+				Interactable->SetActorEnableCollision(false);
+				Interactable2->SetActorEnableCollision(false);
+				NumExpectedHitInteractables = 0;
 			});
-			LatentBeforeEach(EAsyncExecution::ThreadPool, [this](const FDoneDelegate& Done)
+			LatentBeforeEach(EAsyncExecution::ThreadPool, Timeout, [this](const FDoneDelegate& Done)
 			{
 				AsyncTask(ENamedThreads::AnyThread, [this, Done]()
 				{
-					bool bNextFrameReady = false;
-					while (bNextFrameReady == false)
+					bool bAreInteractablesOutOfTrace = false;
+					while (bAreInteractablesOutOfTrace == false)
 					{
-						bNextFrameReady = FWaitForNextEngineFrameCommand().Update();
+						ActualHitInteractables = InteractionComponent->GetInteractables();
+						bAreInteractablesOutOfTrace = ActualHitInteractables.Num() == 0;
 					}
 					Done.Execute();
 				});
 			});
-			It("Should Not Find Any Hit Result", [this]()
+			It("Should Not Find Any Hit Interactable", [this]()
 			{
-				NumActualHitResults = InteractionComponent->GetHitResults().Num();
-				TestEqual(FString::Printf(TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"),
-				                          NumActualHitResults, NumExpectedHitResults), NumActualHitResults,
-				          NumExpectedHitResults);
+				
+				ActualHitInteractables = InteractionComponent->GetInteractables();
+				NumActualHitInteractables = ActualHitInteractables.Num();
+				if(NumActualHitInteractables > 0)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *ActualHitInteractables[0]->GetName())
+				}
+				TestEqual(FString::Printf(TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"),
+				                          NumActualHitInteractables, NumExpectedHitInteractables), NumActualHitInteractables,
+				          NumExpectedHitInteractables);
 			});
 		});
 		Describe("Interactables In Trace", [this]()
 		{
 			BeforeEach([this]()
 			{
-				NumExpectedHitResults = 2;
+				NumExpectedHitInteractables = 2;
 				Interactable->SetActorLocation(FVector(0, 30, 0));
 				Interactable2->SetActorLocation(FVector(0, -30, 0));
 			});
@@ -310,23 +319,19 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 					GetHitResults();
 					Done.Execute();
 				});
-				It("Should Find Two Hit Results", [this]()
+				It("Should Find Two Hit Interactables", [this]()
 				{
-					TestEqual(FString::Printf(TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"),
-					                          NumActualHitResults, NumExpectedHitResults), NumActualHitResults,
-					          NumExpectedHitResults);
+					TestEqual(FString::Printf(TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"),
+					                          NumActualHitInteractables, NumExpectedHitInteractables), NumActualHitInteractables,
+					          NumExpectedHitInteractables);
 				});
 				It("Should Find Interactables From Results", [this]()
 				{
 					AActor* Interactable1Actor = Cast<AActor>(Interactable);
 					AActor* Interactable2Actor = Cast<AActor>(Interactable2);
-					TArray<AActor*> HitActors;
-					for(FHitResult HitResult : ActualHitResults)
-					{
-						HitActors.Add(HitResult.GetActor());
-					}
-					TestTrue("HitActors Contains Interactable", HitActors.Contains(Interactable1Actor));
-					TestTrue("HitActors Contains Interactable2", HitActors.Contains(Interactable2Actor));
+					
+					TestTrue("HitActors Contains Interactable", ActualHitInteractables.Contains(Interactable1Actor));
+					TestTrue("HitActors Contains Interactable2", ActualHitInteractables.Contains(Interactable2Actor));
 				});
 			});
 		});
@@ -334,7 +339,7 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 		{
 			BeforeEach([this]
 			{
-				NumExpectedHitResults = 1;
+				NumExpectedHitInteractables = 1;
 				BlockingTestActor = World->SpawnActor<ABlockingTestActor>();
 				Interactable->SetActorLocation(FVector(70,0,0));
 				Interactable2->SetActorLocation(FVector(10000, 0,0));
@@ -349,20 +354,20 @@ BEGIN_DEFINE_SPEC(FInteractComponent, "Interact.InteractComponent",
 				});
 			});
 
-			It("Should Find One Hit Result Behind Blocking Actor", [this]()
+			It("Should Find One Hit Interactable Behind Blocking Actor", [this]()
 			{
-				TestEqual(FString::Printf(TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"),
-					NumActualHitResults, NumExpectedHitResults), NumActualHitResults, NumExpectedHitResults);
+				TestEqual(FString::Printf(TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"),
+					NumActualHitInteractables, NumExpectedHitInteractables), NumActualHitInteractables, NumExpectedHitInteractables);
 			});
 
 			It("Should Find Interactable", [this]()
 			{
 				AActor* InteractableActor = Cast<AActor>(Interactable);
-				if(ActualHitResults.Num() == 0)
+				if(ActualHitInteractables.Num() == 0)
 				{
-					AddError("Hit Result Count Should Not Be Zero");
+					AddError("Hit Interactable Count Should Not Be Zero");
 				}
-				AActor* HitActor = ActualHitResults[0].GetActor();
+				AActor* HitActor = ActualHitInteractables[0];
 				TestEqual(FString::Printf(TEXT("HitActor: %s == Interactable: %s"), *HitActor->GetName(), *InteractableActor->GetName()), HitActor, InteractableActor);
 			});
 
@@ -419,6 +424,8 @@ void FInteractComponent::Define()
 						Actor = World->SpawnActor<AInteractionTestActor>();
 						InteractionComponent = Actor->GetInteractionComponent();
 						Actor->SetActorLocation(FVector(0, 0, 0));
+						NumActualHitInteractables = 0;
+						ActualHitInteractables.Empty();
 						Done.Execute();
 					}
 				});
@@ -438,7 +445,7 @@ void FInteractComponent::Define()
 					{
 						Interactable->SetActorLocation(FVector(30, 0, 0));
 						InteractionComponent->SetTraceDistance(100);
-						NumExpectedHitResults = 1;
+						NumExpectedHitInteractables = 1;
 					});
 					LatentBeforeEach(EAsyncExecution::ThreadPool, Timeout, [this](const FDoneDelegate& Done)
 					{
@@ -451,13 +458,17 @@ void FInteractComponent::Define()
 					It("Should Have One Hit When One Interactable Is present", [this]()
 					{
 						TestEqual(FString::Printf(
-							          TEXT("ActualHitResults: %d == ExpectedHitResults: %d"), NumActualHitResults,
-							          NumExpectedHitResults), NumActualHitResults, NumExpectedHitResults);
+							          TEXT("ActualHitResults: %d == ExpectedHitResults: %d"), NumActualHitInteractables,
+							          NumExpectedHitInteractables), NumActualHitInteractables, NumExpectedHitInteractables);
 					});
 					It("Should Return Interactable As HitResult", [this]()
 					{
 						AActor* ActualActor = Cast<AActor>(Interactable);
-						AActor* HitActor = ActualHitResults[0].GetActor();
+						if(ActualHitInteractables.Num() == 0)
+						{
+							AddError("Number of Hit Interactables Should Not Be Zero");
+						}
+						AActor* HitActor = ActualHitInteractables[0];
 						TestEqual(FString::Printf(
 							          TEXT("Interactable: %s == HitActor: %s"), *Interactable->GetName(),
 							          *HitActor->GetName()), ActualActor, HitActor);
@@ -484,13 +495,13 @@ void FInteractComponent::Define()
 						It("Should Have One Hit When Multiple Interactables Are Present", [this]()
 						{
 							TestEqual(FString::Printf(
-								          TEXT("ActualHitResults: %d == ExpectedHitResults: %d"), NumActualHitResults,
-								          NumExpectedHitResults), NumActualHitResults, NumExpectedHitResults);
+								          TEXT("ActualHitResults: %d == ExpectedHitResults: %d"), NumActualHitInteractables,
+								          NumExpectedHitInteractables), NumActualHitInteractables, NumExpectedHitInteractables);
 						});
 						It("Should Not Return Second Interactable As HitResult", [this]()
 						{
 							AActor* ActualActor = Cast<AActor>(Interactable);
-							AActor* HitActor = ActualHitResults[0].GetActor();
+							AActor* HitActor = ActualHitInteractables[0];
 							TestEqual(FString::Printf(
 								          TEXT("Interactable: %s == HitActor: %s"), *Interactable->GetName(),
 								          *HitActor->GetName()), ActualActor, HitActor);
@@ -511,7 +522,7 @@ void FInteractComponent::Define()
 					{
 						Interactable->SetActorLocation(FVector(0, 30, 0));
 						InteractionComponent->SetTraceDistance(100);
-						NumExpectedHitResults = 0;
+						NumExpectedHitInteractables = 0;
 					});
 					LatentBeforeEach(EAsyncExecution::ThreadPool, [this](const FDoneDelegate& Done)
 					{
@@ -528,17 +539,17 @@ void FInteractComponent::Define()
 
 					It("Should Not Have Any Result When Interactable Is Not In Path", [this]()
 					{
-						const int HitResultsNum = InteractionComponent->GetHitResults().Num();
+						const int HitResultsNum = InteractionComponent->GetInteractables().Num();
 						TestEqual(FString::Printf(
-							          TEXT("HitResultsNum: %d == NumExpectedHitResults: %d"), HitResultsNum,
-							          NumExpectedHitResults), HitResultsNum, NumExpectedHitResults);
+							          TEXT("HitResultsNum: %d == NumExpectedHitInteractables: %d"), HitResultsNum,
+							          NumExpectedHitInteractables), HitResultsNum, NumExpectedHitInteractables);
 					});
 				});
-				Describe("Non Channel Actor In Trace", [this]()
+				Describe("Blocking Actor In Trace", [this]()
 				{
 					BeforeEach([this]()
 					{
-						NumExpectedHitResults = 0;
+						NumExpectedHitInteractables = 0;
 						BlockingTestActor = World->SpawnActor<ABlockingTestActor>();
 						BlockingTestActor->SetActorLocation(FVector(40, 0, 0));
 						Interactable->SetActorLocation(FVector(90, 0, 0));
@@ -551,11 +562,11 @@ void FInteractComponent::Define()
 							Done.Execute();
 						});
 					});
-					It("Should Find One Hit Result", [this]()
+					It("Should Find One Hit Interactable", [this]()
 					{
 						TestEqual(FString::Printf(
-							          TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"), NumActualHitResults,
-							          NumExpectedHitResults), NumActualHitResults, NumExpectedHitResults);
+							          TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"), NumActualHitInteractables,
+							          NumExpectedHitInteractables), NumActualHitInteractables, NumExpectedHitInteractables);
 					});
 					AfterEach([this]()
 					{
@@ -615,7 +626,7 @@ void FInteractComponent::Define()
 					{
 						Interactable->SetActorLocation(FVector(0, 1000, 0));
 						Interactable2->SetActorLocation(FVector(0, -1000, 0));
-						NumExpectedHitResults = 0;
+						NumExpectedHitInteractables = 0;
 					});
 					LatentBeforeEach(EAsyncExecution::ThreadPool, [this](const FDoneDelegate& Done)
 					{
@@ -629,19 +640,19 @@ void FInteractComponent::Define()
 							Done.Execute();
 						});
 					});
-					It("Should Not Find Any Hit Result", [this]()
+					It("Should Not Find Any Hit Interactable", [this]()
 					{
-						NumActualHitResults = InteractionComponent->GetHitResults().Num();
-						TestEqual(FString::Printf(TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"),
-						                          NumActualHitResults, NumExpectedHitResults), NumActualHitResults,
-						          NumExpectedHitResults);
+						NumActualHitInteractables = InteractionComponent->GetInteractables().Num();
+						TestEqual(FString::Printf(TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"),
+						                          NumActualHitInteractables, NumExpectedHitInteractables), NumActualHitInteractables,
+						          NumExpectedHitInteractables);
 					});
 				});
 				Describe("Interactables In Trace", [this]()
 				{
 					BeforeEach([this]()
 					{
-						NumExpectedHitResults = 2;
+						NumExpectedHitInteractables = 2;
 						Interactable->SetActorLocation(FVector(20, 0, 0));
 						Interactable2->SetActorLocation(FVector(40, 0, 0));
 					});
@@ -653,35 +664,27 @@ void FInteractComponent::Define()
 							Done.Execute();
 						});
 					});
-					It("Should Find Two Hit Results", [this]()
+					It("Should Find Two Hit Interactables", [this]()
 					{
-						TestEqual(FString::Printf(TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"),
-						                          NumActualHitResults, NumExpectedHitResults), NumActualHitResults,
-						          NumExpectedHitResults);
+						TestEqual(FString::Printf(TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"),
+						                          NumActualHitInteractables, NumExpectedHitInteractables), NumActualHitInteractables,
+						          NumExpectedHitInteractables);
 					});
 					It("Should Have Results That Match The Interactables", [this]()
 					{
 						const AActor* InteractableActor = Cast<AActor>(Interactable);
 						const AActor* Interactable2Actor = Cast<AActor>(Interactable2);
 						TestTrue(FString::Printf(TEXT("ActualHitResults Contains Interactable: %s"),
-						                         *Interactable->GetName()), ActualHitResults.ContainsByPredicate(
-							         [InteractableActor](const FHitResult& Result)
-							         {
-								         return Result.GetActor() == InteractableActor;
-							         }));
+						                         *Interactable->GetName()), ActualHitInteractables.Contains(InteractableActor));
 						TestTrue(FString::Printf(TEXT("ActualHitResults Contains Interactable: %s"),
-						                         *Interactable2->GetName()), ActualHitResults.ContainsByPredicate(
-							         [Interactable2Actor](const FHitResult& Result)
-							         {
-								         return Result.GetActor() == Interactable2Actor;
-							         }));
+						                         *Interactable2->GetName()), ActualHitInteractables.Contains(Interactable2Actor));
 					});
 				});
 				Describe("One Interactable In Trace", [this]()
 				{
 					BeforeEach([this]()
 					{
-						NumExpectedHitResults = 1;
+						NumExpectedHitInteractables = 1;
 						Interactable->SetActorLocation(FVector(20, 0, 0));
 						Interactable2->SetActorLocation(FVector(0, 1000, 0));
 					});
@@ -693,35 +696,35 @@ void FInteractComponent::Define()
 							Done.Execute();
 						});
 					});
-					It("Should Find One Hit Result", [this]()
+					It("Should Find One Hit Interactable", [this]()
 					{
-						TestEqual(FString::Printf(TEXT("NumActualHitResults: %d == NumExpectedHitResults %d"),
-						                          NumActualHitResults, NumExpectedHitResults), NumActualHitResults,
-						          NumExpectedHitResults);
+						TestEqual(FString::Printf(TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables %d"),
+						                          NumActualHitInteractables, NumExpectedHitInteractables), NumActualHitInteractables,
+						          NumExpectedHitInteractables);
 					});
 					It("Should Find The Correct Interactable", [this]()
 					{
 						AActor* InteractableActor = Cast<AActor>(Interactable);
-						if (ActualHitResults.Num() == 0)
+						if (ActualHitInteractables.Num() == 0)
 						{
-							AddError("Actual Hit Results Should Not Be Zero");
+							AddError("Actual Hit Interactables Should Not Be Zero");
 						}
-						AActor* HitActor = ActualHitResults[0].GetActor();
+						AActor* HitActor = ActualHitInteractables[0];
 						TestEqual(FString::Printf(
 							          TEXT("ActualHitResult: %s == Interactable: %s"), *HitActor->GetName(),
 							          *Interactable->GetName()), HitActor, InteractableActor);
 					});
 				});
-				Describe("Non Channel Actor In Trace", [this]()
+				Describe("Blocking Actor In Trace", [this]()
 				{
 					BeforeEach([this]()
 					{
-						NumExpectedHitResults = 1;
+						NumExpectedHitInteractables = 1;
 						BlockingTestActor = World->SpawnActor<ABlockingTestActor>();
 						BlockingTestActor->SetActorLocation(FVector(40, 0, 0));
 						Interactable->SetActorLocation(FVector(90, 0, 0));
 					});
-					LatentBeforeEach(EAsyncExecution::ThreadPool, [this](const FDoneDelegate& Done)
+					LatentBeforeEach(EAsyncExecution::ThreadPool, Timeout, [this](const FDoneDelegate& Done)
 					{
 						AsyncTask(ENamedThreads::AnyThread, [this, Done]()
 						{
@@ -729,11 +732,11 @@ void FInteractComponent::Define()
 							Done.Execute();
 						});
 					});
-					It("Should Find One Hit Result", [this]()
+					It("Should Find One Hit Interactable", [this]()
 					{
 						TestEqual(FString::Printf(
-							          TEXT("NumActualHitResults: %d == NumExpectedHitResults: %d"), NumActualHitResults,
-							          NumExpectedHitResults), NumActualHitResults, NumExpectedHitResults);
+							          TEXT("NumActualHitInteractables: %d == NumExpectedHitInteractables: %d"), NumActualHitInteractables,
+							          NumExpectedHitInteractables), NumActualHitInteractables, NumExpectedHitInteractables);
 					});
 					AfterEach([this]()
 					{
@@ -798,8 +801,8 @@ void FInteractComponent::Define()
 				InteractionComponent->DestroyComponent();
 				Actor->Destroy();
 				Interactable->Destroy();
-				NumActualHitResults = 0;
-				ActualHitResults.Empty();
+				NumActualHitInteractables = 0;
+				ActualHitInteractables.Empty();
 				FEndPlayMapCommand().Update();
 				Done.Execute();
 			});
@@ -810,7 +813,7 @@ void FInteractComponent::Define()
 		BeforeEach([this]()
 		{
 			WorldFixture = MakeUnique<FWorldFixture>();
-			if(TestNotNull("World", WorldFixture->GetWorld()))
+			if(WorldFixture->GetWorld() != nullptr)
 			{
 				Interactable = WorldFixture->GetWorld()->SpawnActor<AInteractableTest>();
 			}
@@ -819,7 +822,7 @@ void FInteractComponent::Define()
 		{
 			BeforeEach([this]()
 			{
-				IInteractable::Execute_Selected(Interactable);
+				IInteractable::Execute_Selected(Interactable, nullptr);
 			});
 			It("Should Return True When Calling GetSelected", [this]()
 			{
@@ -831,7 +834,7 @@ void FInteractComponent::Define()
 		{
 			BeforeEach([this]()
 			{
-				IInteractable::Execute_Unselected(Interactable);
+				IInteractable::Execute_Unselected(Interactable, nullptr);
 			});
 			It("Should Return True When Calling GetUnselected", [this]()
 			{
@@ -843,7 +846,7 @@ void FInteractComponent::Define()
 		{
 			BeforeEach([this]()
 			{
-				IInteractable::Execute_Use(Interactable);
+				IInteractable::Execute_Use(Interactable, nullptr);
 			});
 			It("Should Return True When Calling GetUse", [this]()
 			{
@@ -855,7 +858,7 @@ void FInteractComponent::Define()
 		{
 			BeforeEach([this]()
 			{
-				IInteractable::Execute_AlternateUse(Interactable);
+				IInteractable::Execute_AlternateUse(Interactable, nullptr);
 			});
 			It("Should Return True When Calling GetAlternativeUse", [this]()
 			{

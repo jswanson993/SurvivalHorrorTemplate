@@ -13,7 +13,7 @@ ABlockingTestActor::ABlockingTestActor()
 	BoxComponent->SetupAttachment(RootComponent);
 
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	BoxComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECR_Block);
+	BoxComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECR_Block);
 	BoxComponent->SetBoxExtent(FVector(30, 30, 30));
 	
 }

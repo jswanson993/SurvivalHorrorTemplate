@@ -28,44 +28,6 @@ void UInteractionComponent::BeginPlay()
 	ActorsToIgnore.Add(this->GetOwner());
 }
 
-void UInteractionComponent::UpdateHitActors()
-{
-	TArray<AActor*> LastHitActors = HitActors;
-	TArray<AActor*> CurrentHitActors;
-	TArray<FHitResult> NewHitResults = GetHitResults();
-	bIsUpdatingActors = true;
-	//NewHitResults = TArray<FHitResult>::CopyToEmpty(GetHitResults(), GetHitResults().Num(), );
-	for (FHitResult Hit : NewHitResults)
-	{
-		if(Hit.bBlockingHit)
-		{
-			AActor* HitActor = Hit.GetActor();
-			
-			
-			if(HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
-			{
-				IInteractable::Execute_Selected(HitActor);
-				CurrentHitActors.Add(HitActor);
-			}
-
-			if(LastHitActors.Contains(HitActor))
-			{
-				LastHitActors.Remove(HitActor);
-			}
-		}
-	}
-
-	for(AActor* Actor : LastHitActors)
-	{
-		if(Actor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
-		{
-			IInteractable::Execute_Selected(Actor);
-		}
-	}
-
-	HitActors = CurrentHitActors;
-	bIsUpdatingActors = false;
-}
 
 
 // Called every frame
@@ -73,28 +35,36 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                           FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if(!bIsUpdatingActors)
-	{
-		PerformTrace();
-		UpdateHitActors();
-	}
+
+	PerformTrace();
 }
 
-TArray<FHitResult> UInteractionComponent::GetHitResults()
+TArray<AActor*> UInteractionComponent::GetInteractables()
 {
+	TArray<AActor*> Interactables; 
 	switch (TraceStyle)
 	{
-	case Single:
-		HitResults.Empty();
-		if(HitResult.bBlockingHit)
-		{
-			HitResults.Add(HitResult);
-		}
-		break;
-	default:
-		break;
+		case Single:
+			HitResults.Empty();
+			if(HitResult.bBlockingHit)
+			{
+				HitResults.Add(HitResult);
+			}
+			break;
+		default:
+			break;
 	}
-	return HitResults;
+	if(HitResults.Num() > 0)
+	{
+		for(FHitResult Result : HitResults)
+		{
+			if(Result.GetActor() != nullptr && Result.GetActor()->Implements<UInteractable>())
+			{
+				Interactables.Add(Result.GetActor());
+			}
+		}
+	}
+	return Interactables;
 }
 
 void UInteractionComponent::PerformTrace()
@@ -119,57 +89,59 @@ void UInteractionComponent::TraceSingle()
 	FVector StartPoint = GetComponentLocation();
 	FVector EndPoint = (GetForwardVector() * TraceDistance) + GetComponentLocation();
 	FRotator Orientation = GetComponentRotation();
+	const FName TraceTag("InteractionTrace");
+	World->DebugDrawTraceTag = TraceTag;
+	FCollisionQueryParams QueryParams;
+	QueryParams.TraceTag = TraceTag;
+	FCollisionResponseParams ResponseParams;
+	
 	switch (TraceShape)
 	{
 	case ETraceShape::Line:
-		UKismetSystemLibrary::LineTraceSingleForObjects(World,GetComponentLocation(), EndPoint, ObjectTypeQuery,
-		false, ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
-		break;
-	case ETraceShape::Box:
-		UKismetSystemLibrary::BoxTraceSingleForObjects(World, StartPoint, EndPoint, BoxHalfSize, Orientation, ObjectTypeQuery,
-			false, ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
-		break;
-	case ETraceShape::Capsule:
-		UKismetSystemLibrary::CapsuleTraceSingleForObjects(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, ObjectTypeQuery,
-			false,ActorsToIgnore, DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
-		break;
-	case ETraceShape::Sphere:
-		UKismetSystemLibrary::SphereTraceSingleForObjects(World, StartPoint, EndPoint, SphereRadius, ObjectTypeQuery, false, ActorsToIgnore,
-			DrawDebugType, HitResult, true, TraceColor, TraceHitColor, DrawTime);
+		World->LineTraceSingleByChannel(HitResult, StartPoint, EndPoint, TraceChannel, QueryParams, ResponseParams);
 		break;
 	default:
+		FCollisionShape CollisionShape = GetCollisionShapeFromTraceShape(TraceShape);
+		World->SweepSingleByChannel(HitResult, StartPoint, EndPoint, Orientation.Quaternion(), TraceChannel, CollisionShape, QueryParams, ResponseParams);
 		break;
 	}
 }
 
 void UInteractionComponent::TraceMulti()
 {
-	const UWorld* World = GetWorld();
+	UWorld* World = GetWorld();
 	if(World == nullptr){ return; }
 	const FVector StartPoint = GetComponentLocation();
 	const  FVector EndPoint = (GetForwardVector() * TraceDistance) + GetComponentLocation();
 	const FRotator Orientation = GetComponentRotation();
+	const FName TraceTag("InteractionTrace");
+	World->DebugDrawTraceTag = TraceTag;
+	FCollisionQueryParams QueryParams;
+	QueryParams.TraceTag = TraceTag;
+	FCollisionResponseParams ResponseParams;
+	
 	switch (TraceShape)
 	{
 	case ETraceShape::Line:
-
-		UKismetSystemLibrary::LineTraceMultiForObjects(World,GetComponentLocation(), EndPoint, ObjectTypeQuery,
-			false, ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
-		break;
-	case ETraceShape::Box:
-		UKismetSystemLibrary::BoxTraceMultiForObjects(World, StartPoint, EndPoint, BoxHalfSize, Orientation, ObjectTypeQuery,
-			false, ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
-		break;
-	case ETraceShape::Capsule:
-		UKismetSystemLibrary::CapsuleTraceMultiForObjects(World, StartPoint, EndPoint, CapsuleRadius, CapsuleHalfHeight, ObjectTypeQuery,
-			false,ActorsToIgnore, DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
-		break;
-	case ETraceShape::Sphere:
-		UKismetSystemLibrary::SphereTraceMultiForObjects(World, StartPoint, EndPoint, SphereRadius, ObjectTypeQuery, false, ActorsToIgnore,
-			DrawDebugType, HitResults, true, TraceColor, TraceHitColor, DrawTime);
+		World->LineTraceMultiByChannel(HitResults, StartPoint, EndPoint, TraceChannel, QueryParams, ResponseParams);
 		break;
 	default:
+		FCollisionShape CollisionShape = GetCollisionShapeFromTraceShape(TraceShape);
+		World->SweepMultiByChannel(HitResults, StartPoint, EndPoint, Orientation.Quaternion(), TraceChannel, CollisionShape, QueryParams, ResponseParams);
 		break;
+	}
+}
+
+FCollisionShape UInteractionComponent::GetCollisionShapeFromTraceShape(ETraceShape Shape)
+{
+	const FCollisionShape CollisionShape;
+	switch (Shape)
+	{
+		case ETraceShape::Box: return CollisionShape.MakeBox(BoxHalfSize);
+		case ETraceShape::Sphere: return CollisionShape.MakeSphere(SphereRadius);
+		case ETraceShape::Capsule: return CollisionShape.MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
+	default:
+		return CollisionShape;
 	}
 }
 

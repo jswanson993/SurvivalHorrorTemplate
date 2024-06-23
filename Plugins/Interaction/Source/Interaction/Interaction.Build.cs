@@ -17,7 +17,6 @@ public class Interaction : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				// ... add other private include paths required here ...
 			}
 			);
 			
@@ -26,7 +25,6 @@ public class Interaction : ModuleRules
 			new string[]
 			{
 				"Core", "Engine"
-				// ... add other public dependencies that you statically link with here ...
 			}
 			);
 			

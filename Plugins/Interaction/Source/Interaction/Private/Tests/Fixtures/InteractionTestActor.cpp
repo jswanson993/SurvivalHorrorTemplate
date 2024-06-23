@@ -14,11 +14,8 @@ AInteractionTestActor::AInteractionTestActor()
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction"));
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
-	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
-	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery7);
-	InteractionComponent->SetObjectQuery(ObjectTypes);
+	TEnumAsByte<ECollisionChannel> TraceChannel = ECC_GameTraceChannel1;
+	InteractionComponent->SetTraceTypeQuery(TraceChannel);
 	
 	
 }

@@ -22,16 +22,16 @@ class INTERACTION_API IInteractable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintNativeEvent)
-	void Selected();
-	virtual void Selected_Implementation() = 0;
-	UFUNCTION(BlueprintNativeEvent)
-	void Unselected();
-	virtual void Unselected_Implementation() = 0;
-	UFUNCTION(BlueprintNativeEvent)
-	void Use();
-	virtual void Use_Implementation() = 0;
-	UFUNCTION(BlueprintNativeEvent)
-	void AlternateUse();
-	virtual void AlternativeUse_Implementation() = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Selected(AController* SelectedBy);
+	virtual void Selected_Implementation(AController* SelectedBy) = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Unselected(AController* UnselectedBy);
+	virtual void Unselected_Implementation(AController* UnselectedBy) = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Use(AController* UsedBy);
+	virtual void Use_Implementation(AController* UsedBy) = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AlternateUse(AController* AltUsedBy);
+	virtual void AlternateUse_Implementation(AController* AltUsedBy) = 0;
 };

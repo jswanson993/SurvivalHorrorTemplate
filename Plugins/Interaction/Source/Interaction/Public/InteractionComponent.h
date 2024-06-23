@@ -41,9 +41,7 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	float TraceDistance = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuery;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	TEnumAsByte<ETraceTypeQuery> TraceTypeQuery;
+	TEnumAsByte<ECollisionChannel> TraceChannel;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	bool bDrawDebugLine = true;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
@@ -83,11 +81,10 @@ private:
 	void PerformTrace();
 	void TraceSingle();
 	void TraceMulti();
+	FCollisionShape GetCollisionShapeFromTraceShape(ETraceShape Shape);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	void UpdateHitActors();
 
 public:
 	// Called every frame
@@ -101,7 +98,7 @@ public:
 	UFUNCTION(BlueprintSetter)
 	void SetTraceDistance(float NewDistance) { TraceDistance = NewDistance; }
 	UFUNCTION(BlueprintSetter)
-	void SetObjectQuery(const TArray<TEnumAsByte<EObjectTypeQuery>> &NewObjectTypeQuery) { ObjectTypeQuery = NewObjectTypeQuery; }
+	void SetTraceTypeQuery(ECollisionChannel NewTraceChannel) { TraceChannel = NewTraceChannel; }
 	UFUNCTION(BlueprintSetter)
 	void SetDrawDebugLine(bool NewDrawDebugLine) { this->bDrawDebugLine = NewDrawDebugLine; }
 	UFUNCTION(BlueprintSetter)
@@ -123,6 +120,7 @@ public:
 	UFUNCTION(BlueprintSetter)
 	void SetSphereRadius(float NewSphereRadius) { this->SphereRadius = NewSphereRadius; }
 
-	TArray<FHitResult> GetHitResults();
+	UFUNCTION(BlueprintCallable)
+	TArray<AActor*> GetInteractables();
 
 };
