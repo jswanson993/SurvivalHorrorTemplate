@@ -90,7 +90,10 @@ void UInteractionComponent::TraceSingle()
 	FVector EndPoint = (GetForwardVector() * TraceDistance) + GetComponentLocation();
 	FRotator Orientation = GetComponentRotation();
 	const FName TraceTag("InteractionTrace");
-	World->DebugDrawTraceTag = TraceTag;
+	if(bDrawDebugLine == true)
+	{
+		World->DebugDrawTraceTag = TraceTag;
+	}
 	FCollisionQueryParams QueryParams;
 	QueryParams.TraceTag = TraceTag;
 	FCollisionResponseParams ResponseParams;
@@ -115,7 +118,10 @@ void UInteractionComponent::TraceMulti()
 	const  FVector EndPoint = (GetForwardVector() * TraceDistance) + GetComponentLocation();
 	const FRotator Orientation = GetComponentRotation();
 	const FName TraceTag("InteractionTrace");
-	World->DebugDrawTraceTag = TraceTag;
+	if(bDrawDebugLine == true)
+	{
+		World->DebugDrawTraceTag = TraceTag;
+	}
 	FCollisionQueryParams QueryParams;
 	QueryParams.TraceTag = TraceTag;
 	FCollisionResponseParams ResponseParams;

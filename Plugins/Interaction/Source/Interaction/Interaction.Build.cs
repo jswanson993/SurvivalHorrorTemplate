@@ -24,7 +24,7 @@ public class Interaction : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "Engine"
+				"Core", "Engine", "EditorTests"
 			}
 			);
 			

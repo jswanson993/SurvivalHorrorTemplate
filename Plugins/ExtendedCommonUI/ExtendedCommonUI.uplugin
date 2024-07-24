@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "ExtendedCommonUI",
+	"Description": "A Library To Add  Extra Functionality To Common UI",
+	"Category": "Other",
+	"CreatedBy": "Joel Swanson",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ExtendedCommonUI",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

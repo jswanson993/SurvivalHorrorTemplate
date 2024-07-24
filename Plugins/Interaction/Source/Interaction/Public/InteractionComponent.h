@@ -44,16 +44,8 @@ class INTERACTION_API UInteractionComponent : public USceneComponent
 	TEnumAsByte<ECollisionChannel> TraceChannel;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
 	bool bDrawDebugLine = true;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	FColor TraceColor = FColor::Red;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	FColor TraceHitColor = FColor::Green;
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category=Trace, meta=(AllowPrivateAccess="true"))
 	TArray<AActor*> ActorsToIgnore;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType = EDrawDebugTrace::Type::ForOneFrame;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Trace, meta=(AllowPrivateAccess="true"))
-	float DrawTime = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Trace|Shape|Box", meta=(AllowPrivateAccess="true"))
 	FVector BoxHalfSize;
@@ -102,15 +94,7 @@ public:
 	UFUNCTION(BlueprintSetter)
 	void SetDrawDebugLine(bool NewDrawDebugLine) { this->bDrawDebugLine = NewDrawDebugLine; }
 	UFUNCTION(BlueprintSetter)
-	void SetTraceColor(const FColor& NewTraceColor) { this->TraceColor = NewTraceColor; }
-	UFUNCTION(BlueprintSetter)
-	void SetTraceHitColor(const FColor& NewTraceHitColor) { this->TraceHitColor = NewTraceHitColor; }
-	UFUNCTION(BlueprintSetter)
 	void SetActorsToIgnore(const TArray<AActor*>& NewActorsToIgnore) { this->ActorsToIgnore = NewActorsToIgnore; }
-	UFUNCTION(BlueprintSetter)
-	void SetDrawDebugType(const TEnumAsByte<EDrawDebugTrace::Type>& NewDrawDebugType) { this->DrawDebugType = NewDrawDebugType; }
-	UFUNCTION(BlueprintSetter)
-	void SetDrawTime(float NewDrawTime) { this->DrawTime = NewDrawTime; }
 	UFUNCTION(BlueprintSetter)
 	void SetBoxHalfSize(const FVector& NewBoxHalfSize) { this->BoxHalfSize = NewBoxHalfSize; }
 	UFUNCTION(BlueprintSetter)
