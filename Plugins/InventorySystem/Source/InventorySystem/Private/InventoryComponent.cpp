@@ -108,7 +108,7 @@ void UInventoryComponent::CombineSlots(const FGuid SlotId1, const FGuid SlotId2)
 	}
 
 	Slot1->Quantity = Overflow;
-
+	
 	IInventoryWidget::Execute_Update(InventoryWidget, *Slot1);
 	IInventoryWidget::Execute_Update(InventoryWidget, *Slot2);
 }
@@ -167,11 +167,10 @@ bool UInventoryComponent::AddItem_Implementation(FItem Item, int Quantity, int& 
 	}
 
 	UpdateInventoryWidget(SlotsToUpdate);
-
 	return true;
 }
 
-bool UInventoryComponent::UseItem_Implementation(FGuid ItemId)
+bool  UInventoryComponent::UseItem_Implementation(FGuid ItemId)
 {
 	if(!ItemSlots.Contains(ItemId))
 	{
@@ -181,16 +180,12 @@ bool UInventoryComponent::UseItem_Implementation(FGuid ItemId)
 	if(Slot->Item.ActorClass->ImplementsInterface(UInventoryItem::StaticClass()))
 	{
 		AActor* Item = GetWorld()->SpawnActor(Slot->Item.ActorClass);
-		if(Item == nullptr)
+		const APawn* Owner = Cast<APawn>(this->GetOwner());
+		if(Item == nullptr || Owner == nullptr)
 		{
 			return false;
 		}
 		Item->SetActorHiddenInGame(true);
-		APawn* Owner = Cast<APawn>(this->GetOwner());
-		if(Owner == nullptr)
-		{
-			return false;
-		}
 		
 		const bool Consume = IInventoryItem::Execute_UseItem(Item, Owner->GetController());
 		Item->Destroy();
@@ -205,7 +200,6 @@ bool UInventoryComponent::UseItem_Implementation(FGuid ItemId)
 
 bool UInventoryComponent::GetItem_Implementation(const FString& ItemName, FItem& OutItem, int& OutQuantity)
 {
-	bool FoundItem = false;
 	FItem Item = FItem();
 	Item.ItemName = ItemName;
 	TArray<FGuid> SlotIds =  FindInventoryItems(Item);
@@ -214,7 +208,7 @@ bool UInventoryComponent::GetItem_Implementation(const FString& ItemName, FItem&
 	{
 		OutItem = FItem();
 		OutQuantity = 0;
-		return FoundItem;
+		return false;
 	}
 
 	int TotalQuantity = 0;
@@ -224,14 +218,13 @@ bool UInventoryComponent::GetItem_Implementation(const FString& ItemName, FItem&
 		{
 			continue;
 		}
-		FoundItem = true;
 		FSlot* Slot = ItemSlots.Find(Id);
 		OutItem = Slot->Item;
 		TotalQuantity += Slot->Quantity;
 	}
 
 	OutQuantity = TotalQuantity;
-	return FoundItem;
+	return true;
 }
 
 bool UInventoryComponent::DropItem_Implementation(FGuid ItemId, int Quantity)

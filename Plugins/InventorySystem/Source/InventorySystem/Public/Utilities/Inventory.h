@@ -23,12 +23,12 @@ class INVENTORYSYSTEM_API IInventory
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	bool AddItem(FItem Item, int Quantity, int& QuantityRemaining);
-	virtual bool AddItem_Implementation(FItem Item, int Quantity, int& QuantityRemaining) = 0;
+	bool AddItem(FItem Item, int Quantity, int& OutQuantityRemaining);
+	virtual bool AddItem_Implementation(FItem Item, int Quantity, int& OutQuantityRemaining) = 0;
 	UFUNCTION(BlueprintNativeEvent)
 	bool DropItem(FGuid ItemId, int Quantity);
 	virtual bool DropItem_Implementation(FGuid ItemId, int Quantity) = 0;
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool UseItem(FGuid ItemId);
 	virtual bool UseItem_Implementation(FGuid ItemId) = 0;
 	UFUNCTION(BlueprintNativeEvent)

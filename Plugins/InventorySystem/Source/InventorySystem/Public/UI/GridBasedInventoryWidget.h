@@ -8,8 +8,10 @@
 #include "GridBasedInventoryWidget.generated.h"
 
 class UExtendedCommonActivatableWidget;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCombinedSlotsDelegate, FGuid, Slot1, FGuid, Slot2);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemUsedDelegate, FGuid, SlotId);
+
 
 enum EMoveWidgetState : int;
 class UGridInventorySlot;
@@ -21,8 +23,9 @@ class UCommonBoundActionBar;
 UCLASS(BlueprintType, Blueprintable)
 class INVENTORYSYSTEM_API UGridBasedInventoryWidget : public UExtendedCommonActivatableWidget, public IInventoryWidget
 {
+	
 	GENERATED_BODY()
-
+	
 	//Subwidgets
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget, AllowPrivateAccess="true"))
 	UGridPanel* SlotPanel;
@@ -65,6 +68,9 @@ class INVENTORYSYSTEM_API UGridBasedInventoryWidget : public UExtendedCommonActi
 protected:
 	
 	virtual void NativeOnInitialized() override;
+	virtual void NativeOnActivated() override;
+
+	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnItemUsed(FGuid SlotId);
@@ -73,9 +79,12 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnSlotClicked(UGridInventorySlot* Button);
 	virtual void OnSlotClicked_Implementation(UGridInventorySlot* Button);
-	
+
+	UFUNCTION(BlueprintCallable)
 	void StartMove();
+	UFUNCTION(BlueprintCallable)
 	void FinishMove();
+	UFUNCTION(BlueprintCallable)
 	void Move();
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -106,6 +115,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, meta=(DisplayName="Combine Slots Dispatcher"))
 	FCombinedSlotsDelegate OnCombineSlots;
+	
 	UPROPERTY(BlueprintAssignable, meta=(DisplayName="Item Used Dispatcher"))
 	FItemUsedDelegate OnUseItem;
 

@@ -51,7 +51,6 @@ protected:
 	virtual FVector2D GetItemSize(const FItem Item);
 	UFUNCTION(BlueprintCallable)
 	virtual void CombineSlots(const FGuid SlotId1, const FGuid SlotId2);
-	
 public:	
 	// Called every frameFItem GetItem_Implementation(const FString ItemName)
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

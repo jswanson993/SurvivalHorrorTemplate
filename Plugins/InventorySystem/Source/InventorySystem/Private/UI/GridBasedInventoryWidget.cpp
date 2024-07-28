@@ -5,6 +5,8 @@
 
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
+#include "GameFramework/GameSession.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/GridInventorySlot.h"
 
 void UGridBasedInventoryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -47,7 +49,6 @@ bool UGridBasedInventoryWidget::Add_Implementation(FSlot InventorySlot)
 			SlotArray[Index] = NewSlotWidget;
 		}
 	}
-	
 	return true;
 }
 
@@ -55,12 +56,12 @@ bool UGridBasedInventoryWidget::Update_Implementation(FSlot InventorySlot)
 {
 	if(InventorySlots.IsEmpty())
 	{
-		return Add(InventorySlot);
+		return Add(InventorySlot);;
 	}
 
 	if(!InventorySlots.Contains(InventorySlot.SlotId))
 	{
-		return false;		
+		return false;
 	}
 	const int SlotIndex = *InventorySlots.Find(InventorySlot.SlotId);
 	if(!SlotIndex && SlotIndex < SlotArray.Num())
@@ -100,6 +101,25 @@ void UGridBasedInventoryWidget::NativeOnInitialized()
 
 		InputActionExecutedDelegate.BindDynamic(this, &UGridBasedInventoryWidget::HandleInput);
 	}
+}
+
+void UGridBasedInventoryWidget::NativeOnActivated()
+{
+	Super::NativeOnActivated();
+
+	this->GetDesiredFocusTarget()->SetFocus();
+}
+
+UWidget* UGridBasedInventoryWidget::NativeGetDesiredFocusTarget() const
+{
+	UWidget* FocusWidget = Super::NativeGetDesiredFocusTarget();
+
+	if(SlotArray.Num() > 0)
+	{
+		FocusWidget = SlotArray[0];
+	}
+
+	return FocusWidget;
 }
 
 
