@@ -62,7 +62,7 @@ class INVENTORYSYSTEM_API UGridInventorySlot : public UCommonButtonBase
 	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess="true"))
 	FLinearColor MovementBlockedColor = {1, 0, 0, .75};
 	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess="true"))
-	FLinearColor MovementCombineColor  {0, 0, 1, .75};
+	FLinearColor MovementCombineColor = {0, 0, 1, .75};
 
 	//Variables
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
@@ -70,7 +70,7 @@ class INVENTORYSYSTEM_API UGridInventorySlot : public UCommonButtonBase
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	FSlot ItemSlot;
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	bool bIsEmpty;
+	bool bIsEmpty = false;
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	bool bIsMoving;
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))

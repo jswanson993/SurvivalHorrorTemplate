@@ -29,7 +29,8 @@ void UGridInventorySlot::SlotInfoUpdate()
 		QuantityBorder->SetVisibility(ESlateVisibility::Hidden);
 		QuantityText->SetVisibility(ESlateVisibility::Hidden);
 		ItemIcon->SetBrushFromTexture(EmptySlotIcon);
-		ItemIcon->SetColorAndOpacity(FLinearColor::White);
+		const FLinearColor OpaqueWhite = {255,255,255,.75};
+		ItemIcon->SetColorAndOpacity(OpaqueWhite);
 		bIsEmpty = true;
 	}else
 	{
@@ -110,7 +111,10 @@ void UGridInventorySlot::NativeOnHovered()
 {
 	Super::NativeOnHovered();
 
-	OnHovered.ExecuteIfBound(this);
+	if(!OnHovered.ExecuteIfBound(this))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("On Hovered Event Failed To Execute"));
+	}
 }
 
 void UGridInventorySlot::NativeOnUnhovered()

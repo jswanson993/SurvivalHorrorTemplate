@@ -124,4 +124,9 @@ public:
 	virtual bool Add_Implementation(FSlot InventorySlot) override;
 	virtual bool Update_Implementation(FSlot InventorySlot) override;
 	virtual bool Remove_Implementation(FSlot InventorySlot) override;
+
+	UFUNCTION(BlueprintCallable)
+	EMoveWidgetState GetMoveMode() const { return MoveMode; }
+	UFUNCTION(BlueprintCallable)
+	void SetMoveMode(const EMoveWidgetState NewState) { MoveMode = NewState; }
 };

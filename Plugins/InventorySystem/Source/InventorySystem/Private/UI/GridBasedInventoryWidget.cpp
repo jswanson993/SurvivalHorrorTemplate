@@ -27,7 +27,7 @@ bool UGridBasedInventoryWidget::Add_Implementation(FSlot InventorySlot)
 		return false;
 	}
 
-	UGridInventorySlot* NewSlotWidget = CreateWidget<UGridInventorySlot>(this, SlotWidget->StaticClass());
+	UGridInventorySlot* NewSlotWidget = CreateWidget<UGridInventorySlot>(this, SlotWidget);
 	NewSlotWidget->SetItemSlot(InventorySlot);
 	NewSlotWidget->OnHovered.BindDynamic(this, &UGridBasedInventoryWidget::UpdateHoveredSlot);
 	NewSlotWidget->OnUse.BindDynamic(this, &UGridBasedInventoryWidget::OnItemUsed);
@@ -49,6 +49,8 @@ bool UGridBasedInventoryWidget::Add_Implementation(FSlot InventorySlot)
 			SlotArray[Index] = NewSlotWidget;
 		}
 	}
+
+	NewSlotWidget->SlotInfoUpdate();
 	return true;
 }
 
@@ -192,11 +194,20 @@ bool UGridBasedInventoryWidget::FindSlotPlacement_Implementation(const FSlot Inv
 
 void UGridBasedInventoryWidget::InitializeOpenSlots()
 {
+	if(SlotWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Error: Slot Widget Not Set"))
+		return;
+	}
 	for(int i = 0; i < MaxHeight-1; i++)
 	{
 		for(int j = 0; j < MaxWidth - 1; j++)
 		{
-			UGridInventorySlot* NewEmptySlot = Cast<UGridInventorySlot>(CreateWidget(this, SlotWidget->StaticClass()));
+			auto NewEmptySlot = CreateWidget<UGridInventorySlot>(this, SlotWidget);
+			if(NewEmptySlot == nullptr)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Error: Could Not Create Slot From Slot Widget"))
+			}
 			NewEmptySlot->SetItemSlot({});
 			NewEmptySlot->SetIsEmpty(true);
 			NewEmptySlot->AddToViewport();
