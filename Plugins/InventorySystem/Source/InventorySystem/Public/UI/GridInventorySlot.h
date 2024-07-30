@@ -72,9 +72,9 @@ class INVENTORYSYSTEM_API UGridInventorySlot : public UCommonButtonBase
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	bool bIsEmpty = false;
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	bool bIsMoving;
+	bool bIsMoving = false;
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	bool bCanInteract;
+	bool bCanInteract = true;
 	
 
 public:

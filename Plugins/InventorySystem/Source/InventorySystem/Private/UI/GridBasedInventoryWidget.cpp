@@ -66,7 +66,7 @@ bool UGridBasedInventoryWidget::Update_Implementation(FSlot InventorySlot)
 		return false;
 	}
 	const int SlotIndex = *InventorySlots.Find(InventorySlot.SlotId);
-	if(!SlotIndex && SlotIndex < SlotArray.Num())
+	if(SlotIndex > SlotArray.Num())
 	{
 		return false;
 	}

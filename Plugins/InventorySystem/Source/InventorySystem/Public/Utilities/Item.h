@@ -29,7 +29,7 @@ struct INVENTORYSYSTEM_API FItem
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsUsable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsSingleTon;
+	bool bIsSingleton;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MaxQuantity;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -43,7 +43,7 @@ struct INVENTORYSYSTEM_API FItem
 		ItemIcon = nullptr;
 		ItemMesh = nullptr;
 		bIsUsable = false;
-		bIsSingleTon = false;
+		bIsSingleton = false;
 		MaxQuantity = 0;
 		ActorClass = nullptr;
 	}

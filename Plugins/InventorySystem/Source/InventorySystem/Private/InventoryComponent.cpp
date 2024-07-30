@@ -149,7 +149,7 @@ bool UInventoryComponent::AddItem_Implementation(FItem Item, int Quantity, int& 
 		FSlot* Slot = ItemSlots.Find(SlotId);
 		int Overflow;
 		const bool bIsOverMaxQuantity = CheckSlotOverMaxQuantity(*Slot, QuantityRemaining, Overflow);
-		if(bIsOverMaxQuantity && Item.bIsSingleTon)
+		if(bIsOverMaxQuantity && Item.bIsSingleton)
 		{
 			Overflow = 0;
 		}
@@ -163,7 +163,7 @@ bool UInventoryComponent::AddItem_Implementation(FItem Item, int Quantity, int& 
 	}
 	while(QuantityRemaining != 0)
 	{
-		AddToInventoryWidget(QuantityRemaining, Item, GetItemSize(Item));
+		QuantityRemaining = AddToInventoryWidget(QuantityRemaining, Item, GetItemSize(Item));
 	}
 
 	UpdateInventoryWidget(SlotsToUpdate);
