@@ -29,6 +29,8 @@ class INVENTORYSYSTEM_API UGridBasedInventoryWidget : public UExtendedCommonActi
 	//Subwidgets
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget, AllowPrivateAccess="true"))
 	UGridPanel* SlotPanel;
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget, AllowPrivateAccess="true"))
+	UCommonBoundActionBar* ActionBar;
 
 	//Defaults
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
@@ -56,9 +58,8 @@ class INVENTORYSYSTEM_API UGridBasedInventoryWidget : public UExtendedCommonActi
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	UGridInventorySlot* OriginalSlot;
 
-	UPROPERTY(EditDefaultsOnly, Category=Input, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess="true"))
 	TArray<FDataTableRowHandle> Inputs;
-	FInputActionExecutedDelegate InputActionExecutedDelegate;
 	
 	EMoveWidgetState MoveMode;
 	FVector2D HoveredCoordinate = {0, 0};
