@@ -7,6 +7,7 @@
 #include "Components/GridSlot.h"
 #include "GameFramework/GameSession.h"
 #include "Kismet/GameplayStatics.h"
+#include "Spatial/PointHashGrid2.h"
 #include "UI/GridInventorySlot.h"
 
 void UGridBasedInventoryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -94,14 +95,6 @@ void UGridBasedInventoryWidget::NativeOnInitialized()
 	for(UGridInventorySlot* InventorySlot : SlotArray)
 	{
 		InventorySlot->OnHovered.BindDynamic(this, &UGridBasedInventoryWidget::UpdateHoveredSlot);
-	}
-
-	for(const FDataTableRowHandle RowHandle: Inputs)
-	{
-		FInputActionBindingHandle BindingHandle;
-		this->RegisterBinding(RowHandle, InputActionExecutedDelegate, BindingHandle);
-
-		InputActionExecutedDelegate.BindDynamic(this, &UGridBasedInventoryWidget::HandleInput);
 	}
 }
 
@@ -199,14 +192,15 @@ void UGridBasedInventoryWidget::InitializeOpenSlots()
 		UE_LOG(LogTemp, Error, TEXT("Error: Slot Widget Not Set"))
 		return;
 	}
-	for(int i = 0; i < MaxHeight-1; i++)
+	for(int i = 0; i < MaxHeight; i++)
 	{
-		for(int j = 0; j < MaxWidth - 1; j++)
+		for(int j = 0; j < MaxWidth; j++)
 		{
 			auto NewEmptySlot = CreateWidget<UGridInventorySlot>(this, SlotWidget);
 			if(NewEmptySlot == nullptr)
 			{
 				UE_LOG(LogTemp, Error, TEXT("Error: Could Not Create Slot From Slot Widget"))
+				return;
 			}
 			NewEmptySlot->SetItemSlot({});
 			NewEmptySlot->SetIsEmpty(true);
@@ -273,6 +267,11 @@ int UGridBasedInventoryWidget::GetIndexFromCoordinates(const FVector2D Coordinat
 	return (Coordinate.Y * MaxWidth) + Coordinate.X;
 }
 
+int GetExtent(int Index, int Span)
+{
+	return Index + Span;
+}
+
 void UGridBasedInventoryWidget::StartMove()
 {
 	if(HoveredSlot->GetIsEmpty())
@@ -282,9 +281,9 @@ void UGridBasedInventoryWidget::StartMove()
 
 	bIsMoving = true;
 
-	MovingSlot = CreateWidget<UGridInventorySlot>(this, SlotWidget->StaticClass());
+	MovingSlot = CreateWidget<UGridInventorySlot>(this, SlotWidget);
 	MovingSlot->SetItemSlot(HoveredSlot->GetItemSlot());
-	MovingSlot->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	MovingSlot->SetVisibility(ESlateVisibility::HitTestInvisible);
 	MovingSlot->SlotInfoUpdate();
 	MovingSlot->AddToViewport();
 	
@@ -299,40 +298,40 @@ void UGridBasedInventoryWidget::StartMove()
 
 void UGridBasedInventoryWidget::FinishMove()
 {
-	int RowExtent;
-	int ColumnExtent;
 	UGridSlot* MovingGridSlot;
-	
+	UGridSlot* OriginalGridSlot;
 	switch(MoveMode)
 	{
 	case Clear:
-		
-		for(int i = 0; i < SlotArray.Num(); i++)
+		OriginalGridSlot = Cast<UGridSlot>(OriginalSlot->Slot); 
+		SlotPanel->RemoveChild(OriginalSlot);
+		for(int Row = OriginalGridSlot->GetRow(); Row < GetExtent(OriginalGridSlot->GetRow(), OriginalGridSlot->GetRowSpan()); Row++)
 		{
-			if(SlotPanel->GetParent() == nullptr)
+			for(int Column = OriginalGridSlot->GetColumn(); Column < GetExtent(OriginalGridSlot->GetColumn(), OriginalGridSlot->GetColumnSpan()); Column++)
 			{
-				continue;
-			}
+				const FVector2D Coordinate(Column, Row);
+				if(SlotArray[GetIndexFromCoordinates(Coordinate)]->GetParent() != nullptr)
+				{
+					continue;
+				}
 
-			auto NewEmptySlot = CreateWidget<UGridInventorySlot>(this, SlotWidget->StaticClass());
-			NewEmptySlot->SetIsEmpty(true);
-			NewEmptySlot->SlotInfoUpdate();
-			NewEmptySlot->AddToViewport();
-			NewEmptySlot->OnHovered.BindDynamic(this, &UGridBasedInventoryWidget::UpdateHoveredSlot);
+				auto NewEmptySlot = CreateWidget<UGridInventorySlot>(this, SlotWidget);
+				NewEmptySlot->SetIsEmpty(true);
+				NewEmptySlot->SlotInfoUpdate();
+				NewEmptySlot->AddToViewport();
+				NewEmptySlot->OnHovered.BindDynamic(this, &UGridBasedInventoryWidget::UpdateHoveredSlot);
 			
-			UGridSlot* GridSlot = SlotPanel->AddChildToGrid(NewEmptySlot, Cast<UGridSlot>(OriginalSlot->Slot)->GetRow(), Cast<UGridSlot>(OriginalSlot->Slot)->GetColumn());
-			GridSlot->SetPadding(SlotPadding);
-			SlotArray[i] = NewEmptySlot;
-			SlotPanel->RemoveChild(OriginalSlot);
+				UGridSlot* GridSlot = SlotPanel->AddChildToGrid(NewEmptySlot, OriginalGridSlot->GetRow(), OriginalGridSlot->GetColumn());
+				GridSlot->SetPadding(SlotPadding);
+				SlotArray[GetIndexFromCoordinates(Coordinate)] = NewEmptySlot;
+			}
 		}
 		MovingGridSlot = Cast<UGridSlot>(MovingSlot->Slot);
-		RowExtent = MovingGridSlot->GetRow() + MovingGridSlot->GetRowSpan();
-		ColumnExtent = MovingGridSlot->GetColumn() + MovingGridSlot->GetColumnSpan();
-		for(int i = MovingGridSlot->GetRow(); i < RowExtent; i++)
+		for(int Row = MovingGridSlot->GetRow(); Row < GetExtent(MovingGridSlot->GetRow(), MovingGridSlot->GetRowSpan()); Row++)
 		{
-			for(int j = MovingGridSlot->GetColumn(); i < ColumnExtent; i++)
+			for(int Column = MovingGridSlot->GetColumn(); Column < GetExtent(MovingGridSlot->GetColumn(),  MovingGridSlot->GetColumnSpan()); Column++)
 			{
-				const FVector2D Coordinates(j, i);
+				const FVector2D Coordinates(Column, Row);
 				const int SlotIndex = GetIndexFromCoordinates(Coordinates);
 				SlotArray[SlotIndex]->RemoveFromParent();
 				SlotArray[SlotIndex] = MovingSlot;
@@ -364,9 +363,9 @@ void UGridBasedInventoryWidget::FinishMove()
 
 void UGridBasedInventoryWidget::Move()
 {
-	const FVector2D Coordinates = GetCoordinatesFromIndex(SlotArray.Find(HoveredSlot));
-	const int Row = Coordinates.Y;
-	const int Column = Coordinates.X;
+	const UGridSlot* HoveredGridSlot = Cast<UGridSlot>(HoveredSlot->Slot);
+	const int Row = HoveredGridSlot->GetRow();
+	const int Column = HoveredGridSlot->GetColumn();
 	if(((MovingSlot->GetItemSlot().Size.Y + Row) > MaxHeight) ||
 		((MovingSlot->GetItemSlot().Size.X + Column) > MaxWidth))
 	{
@@ -382,13 +381,13 @@ void UGridBasedInventoryWidget::Move()
 
 	GridSlot->SetRow(Row);
 	GridSlot->SetColumn(Column);
-	const int RowExtent = Coordinates.Y + MovingSlot->GetItemSlot().Size.Y;
-	const int ColumnExtent = Coordinates.X + MovingSlot->GetItemSlot().Size.X;
+	const int RowExtent = Row + MovingSlot->GetItemSlot().Size.Y - 1;
+	const int ColumnExtent = Column + MovingSlot->GetItemSlot().Size.X -1;
 	if(HoveredSlot->GetIsEmpty())
 	{
-		for(int i = Row; i < RowExtent; i++)
+		for(int i = Row; i <= RowExtent; i++)
 		{
-			for(int j = Column; i < ColumnExtent; j++)
+			for(int j = Column; j <= ColumnExtent; j++)
 			{
 				const FVector2D SlotCoordinate(j, i);
 				if(SlotArray[GetIndexFromCoordinates(SlotCoordinate)]->GetIsEmpty())

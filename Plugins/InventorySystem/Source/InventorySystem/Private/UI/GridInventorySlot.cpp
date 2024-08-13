@@ -113,7 +113,7 @@ void UGridInventorySlot::NativeOnHovered()
 
 	if(!OnHovered.ExecuteIfBound(this))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("On Hovered Event Failed To Execute"));
+		UE_LOG(LogTemp, Warning, TEXT("%s: On Hovered Event Failed To Execute"), *this->GetName());
 	}
 }
 
